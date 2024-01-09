@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/LucasBlog.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/LucasBlog.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/LucasBlog.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/LucasBlog.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/LucasBlog.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/LucasBlog.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lsc25846.github.io","root":"/LucasBlog.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="上一次在Win10上安裝完了CUDA+Pytorch 今天就來記錄在這裝置上執行UNet遇到的事情 今天要執行的是這一版本的UNet: milesial">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Win10上執行PyTorch版本的UNet訓練自己的資料集">
+<meta property="og:url" content="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/index.html">
+<meta property="og:site_name" content="Lucas&#39;s Bolg">
+<meta property="og:description" content="上一次在Win10上安裝完了CUDA+Pytorch 今天就來記錄在這裝置上執行UNet遇到的事情 今天要執行的是這一版本的UNet: milesial">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*uvtqY9fUxXBMAovqkXWX5g.jpeg">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*u0ffSTtzYCXc72qjFdihgQ.gif">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*tsX9TEeWp2Y5V2LNPjn6fg.jpeg">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*_4WIY-UyfOZmQeiTc86XSA.jpeg">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*0xnzx0i6NedO5ZS_o1QL3A.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:720/format:webp/1*HOHZ7alaq6PFAgF3gHZyPg.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:640/format:webp/1*hK28n3DfOC4KT-SKEZVl1Q.png">
+<meta property="article:published_time" content="2022-04-22T10:00:24.000Z">
+<meta property="article:modified_time" content="2024-01-09T10:20:49.029Z">
+<meta property="article:author" content="Lucas Lin">
+<meta property="article:tag" content="Deep Learning">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*uvtqY9fUxXBMAovqkXWX5g.jpeg">
+
+<link rel="canonical" href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>在Win10上執行PyTorch版本的UNet訓練自己的資料集 | Lucas's Bolg</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/LucasBlog.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lucas's Bolg</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">AI套膜仔的職場生存日記</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/LucasBlog.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/LucasBlog.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/LucasBlog.github.io/images/author-image.png">
+      <meta itemprop="name" content="Lucas Lin">
+      <meta itemprop="description" content="我有一百塊可以吃很多碗">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lucas's Bolg">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          在Win10上執行PyTorch版本的UNet訓練自己的資料集
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2022-04-22 18:00:24" itemprop="dateCreated datePublished" datetime="2022-04-22T18:00:24+08:00">2022-04-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2024-01-09 18:20:49" itemprop="dateModified" datetime="2024-01-09T18:20:49+08:00">2024-01-09</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>上一次在Win10上安裝完了CUDA+Pytorch</p>
+<p>今天就來記錄在這裝置上執行UNet遇到的事情</p>
+<p>今天要執行的是這一版本的UNet:</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/milesial/Pytorch-UNet?source=post_page-----c59006b5964--------------------------------">milesial</a></p>
+<span id="more"></span>
+<p>按照下面教學的指示，先將專案下載下來</p>
+<p>打開Anaconda Prompt</p>
+<p>cd到專案所在的資料夾後，執行:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install -r requirements.txt</span><br></pre></td></tr></table></figure>
+<p>安裝執行專案所有需要的函式庫</p>
+<p>然後下載專案中提供的Carvana資料集來進行訓練:</p>
+<p><a target="_blank" rel="noopener" href="https://www.kaggle.com/c/carvana-image-masking-challenge?source=post_page-----c59006b5964--------------------------------">Carvana</a></p>
+<p>“這個資料集只有切割出車子與背景兩個類別”</p>
+<p>資料集大概像這樣</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*uvtqY9fUxXBMAovqkXWX5g.jpeg" alt="image_Car"><br>影像(image)</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*u0ffSTtzYCXc72qjFdihgQ.gif" alt="image_SegCar"><br>遮罩(mask)</p>
+<p>在data&#x2F;image資料夾中放入要訓練的影像；data&#x2F;mask放入對應影像的遮罩</p>
+<p>接下來就可以進行訓練囉!</p>
+<p>在剛剛cd到專案所在位置的Anaconda Prompt中輸入:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python train.py -e 10 --amp</span><br></pre></td></tr></table></figure>
+<p>其中的-e是指Epoch，預設是10</p>
+<p>訓練完的權重會儲存在checkpoints資料夾中</p>
+<p>訓練完成後來測試看看，一樣在剛剛的Anaconda Prompt中輸入:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python predict.py -m ./checkpoints\checkpoint_epoch10.pth -i ./testimage\input\你要測試的影像.jpg -o ./testimage\output\輸出影像.jpg</span><br></pre></td></tr></table></figure>
+<p>改變上面的參數就可以選擇要使用哪一個權重進行測試、測試哪張影像跟輸出影像的檔案名稱!</p>
+<p>以下是我訓練了10個Epoch的輸出結果<br><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*tsX9TEeWp2Y5V2LNPjn6fg.jpeg" alt="image_testCar"><br><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*_4WIY-UyfOZmQeiTc86XSA.jpeg" alt="image_testCarSeg"><br>這個UNet訓練結果不錯喔 蠻結實的</p>
+<p>以上就是使用PyTorch版本UNet訓練Carvana資料集的結果拉~</p>
+<p>那我應該怎麼訓練自己的資料集呢</p>
+<p>首先 我們需要先建立自己的資料</p>
+<p>網路上大家成功訓練的案例都是使用labelme來進行標記</p>
+<p>所以我也就照抄</p>
+<p>先安裝labelme:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install labelme==3.16.2</span><br></pre></td></tr></table></figure>
+<p>這邊安裝labelme3.16.2版，為什麼我晚點解釋</p>
+<p>安裝完後在Anaconda Prompt裡面輸入:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">labelme</span><br></pre></td></tr></table></figure>
+<p><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*0xnzx0i6NedO5ZS_o1QL3A.png" alt="image_labelme"><br>就會開啟這個酷酷的東西</p>
+<p>然後開始進行標記，把OpenDir設到資料集中影像(image)所在的資料夾</p>
+<p>然後點File-&gt;Change Output Dir選擇輸出遮罩(mask)的資料夾</p>
+<p>接下來就可以開始標記拉</p>
+<p>原本以為這次專案可以這麼順利，但標記完之後才知道我真的是太天真了</p>
+<p>首先，labelme標記完輸出是Json檔，而UNet吃的檔案則是PNG檔，哭阿</p>
+<p>這邊我想用labelme內建的轉檔程式</p>
+<p>內建轉檔程式的位置在:<br><img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*HOHZ7alaq6PFAgF3gHZyPg.png" alt="image_labelmeCli"></p>
+<p>但是跑不起來，一執行就閃退，只好手動修改一下:</p>
+<p>修改完後一樣cd到程式所在的資料夾，然後輸入:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python json_to_dataset.py D:\你要轉的檔案路徑</span><br></pre></td></tr></table></figure>
+<p>然後就</p>
+<p>module ‘labelme.utils’ has no attribute ‘draw_label’ 報錯 哭阿</p>
+<p>查了一下發現是labelme安裝版本的問題，所以前面才說要安裝3.16.2版</p>
+<p>轉檔完成後，把資料都丟進去，本來以為可以訓練了</p>
+<p>結果又報錯</p>
+<p>AssertionError: Either no mask or multiple masks found for the ID</p>
+<p>原因是因為轉完的遮罩檔案名稱後綴是XX_json_label.png，可是UNet要得是XX_mask.png</p>
+<p>看來只好繼續寫程式轉檔了:</p>
+<p>轉完之後再來執行看看</p>
+<p>猜猜怎麼樣</p>
+<p>嘿嘿 Bingo答對囉 又報錯:</p>
+<p>RuntimeError: only batches of spatial targets supported (3D tensors) but got targets of size: : [1, 256, 256, 3]</p>
+<p>原因:轉出來的png檔案是彩色，通道數&#x3D;3</p>
+<p>可是UNet吃的Mask是灰階，通道數&#x3D;1</p>
+<p>哀 好吧 再寫一支程式，把影像轉成灰階:</p>
+<p>轉完之後再測試一次看看:</p>
+<p>IndexError: Target 38 is out of bounds.</p>
+<p>上網查了一下，說有可能是因為數據不匹配，</p>
+<p>看了之後才發現，這個UNet每一個像素點的值都是一個類別，也就是說，標記出來的區域應該要是灰階值為1的區域，才能成功運行。</p>
+<p>哀 好吧:</p>
+<p>把數據轉完之後測試了一下，兩個類別(背景+1個標記類別)跟三個類別大致上可以成功運作了，但超過4個預測時又双叒叕會出錯。</p>
+<p>ValueError: pic should not have &gt; 4 channels. Got 5 channels.</p>
+<p>原因出在predict.py這邊:<br><img src="https://miro.medium.com/v2/resize:fit:640/format:webp/1*hK28n3DfOC4KT-SKEZVl1Q.png" alt="image_predict.py"><br>這邊輸出超過4個類別時，沒有辦法轉成PILImage，哭阿。</p>
+<p>除錯到這邊，在這支程式上花了兩天的我決定</p>
+<p>Google搜尋:UNet +Multi-class + GitHub</p>
+<p>訓練多個類別的UNet&#x2F;UNet++ 我下一篇再來記錄囉!</p>
+
+    </div>
+
+    
+    
+    
+        
+<!--
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>Lucas Lin
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/" title="在Win10上執行PyTorch版本的UNet訓練自己的資料集">https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/在Win10上執行PyTorch版本的UNet訓練自己的資料集/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+-->
+<div class="post-copyright d-flex">
+  <img class="site-author-image" itemprop="image" alt="Lucas Lin"
+        src="/LucasBlog.github.io/images/author-image.png">
+  <ul class="list-style-none">
+    <li class="post-copyright-author">
+      <strong>作者： </strong>Lucas Lin
+    </li>
+    <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/" title="在Win10上執行PyTorch版本的UNet訓練自己的資料集">https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/在Win10上執行PyTorch版本的UNet訓練自己的資料集/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+    </li>
+  </ul>
+</div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/LucasBlog.github.io/tags/Deep-Learning/" rel="tag"># Deep Learning</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/LucasBlog.github.io/2022/04/21/Windows%2010%20%E5%AE%89%E8%A3%9DCUDA%E3%80%81cuDNN%E3%80%81Pytorch%E7%B4%80%E9%8C%84/" rel="prev" title="Windows 10 安裝CUDA、cuDNN、Pytorch紀錄">
+      <i class="fa fa-chevron-left"></i> Windows 10 安裝CUDA、cuDNN、Pytorch紀錄
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/LucasBlog.github.io/2022/04/27/UNet++(Nested%20UNet)%E5%AE%89%E8%A3%9D%E7%B4%80%E9%8C%84/" rel="next" title="UNet++(Nested UNet)安裝紀錄">
+      UNet++(Nested UNet)安裝紀錄 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lucas Lin"
+      src="/LucasBlog.github.io/images/author-image.png">
+  <p class="site-author-name" itemprop="name">Lucas Lin</p>
+  <div class="site-description" itemprop="description">我有一百塊可以吃很多碗</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/LucasBlog.github.io/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">標籤</span>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/LucasBlog.github.io/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a target="_blank" rel="noopener" href='https://www.linkedin.com/in/lucas-lin-209a0a229/'>LucasLin</a></span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/LucasBlog.github.io/lib/anime.min.js"></script>
+  <script src="/LucasBlog.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/LucasBlog.github.io/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/LucasBlog.github.io/js/utils.js"></script>
+
+<script src="/LucasBlog.github.io/js/motion.js"></script>
+
+
+<script src="/LucasBlog.github.io/js/schemes/muse.js"></script>
+
+
+<script src="/LucasBlog.github.io/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

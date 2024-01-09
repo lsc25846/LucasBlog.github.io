@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/LucasBlog.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/LucasBlog.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/LucasBlog.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/LucasBlog.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/LucasBlog.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/LucasBlog.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lsc25846.github.io","root":"/LucasBlog.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="接續上一篇文中所訓練的瑕疵檢測類神經網路，在原作者的版本中只能訓練他所提供的DAGM、KSDD、KSDD2、Steel資料集，來重現論文中所展示的成果。而作者也很貼心的在.&#x2F;datasets裡面的README.md中跟大家說該如何在Mixed supervision for surface-defect detection網路上訓練自己的資料集，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用自己的資料集訓練Mixed supervision for surface-defect detection">
+<meta property="og:url" content="https://lsc25846.github.io/LucasBlog.github.io/2022/05/10/%E4%BD%BF%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86%E8%A8%93%E7%B7%B4Mixed%20supervision%20for%20surface-defect%20detection/index.html">
+<meta property="og:site_name" content="Lucas&#39;s Bolg">
+<meta property="og:description" content="接續上一篇文中所訓練的瑕疵檢測類神經網路，在原作者的版本中只能訓練他所提供的DAGM、KSDD、KSDD2、Steel資料集，來重現論文中所展示的成果。而作者也很貼心的在.&#x2F;datasets裡面的README.md中跟大家說該如何在Mixed supervision for surface-defect detection網路上訓練自己的資料集，">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*wNP_C8z6E0AU4ihds91zEw.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:640/format:webp/1*akc6yNf7PoE_rpaG1MIaPQ.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:524/format:webp/1*VHxzAkOYtHUUmfe_60IClw.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:720/format:webp/1*hfdcYI1JclFHQEEb_o0mCg.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:640/format:webp/1*gJsOEVUlToViox9E28iuPg.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:640/format:webp/1*78uwBA7JQ7tUAfzVMopzeg.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:640/format:webp/1*tg8dQMsiE3sjbEcV-Q_rSQ.png">
+<meta property="article:published_time" content="2022-05-10T06:56:34.000Z">
+<meta property="article:modified_time" content="2024-01-09T09:31:05.475Z">
+<meta property="article:author" content="Lucas Lin">
+<meta property="article:tag" content="Defect Detection">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*wNP_C8z6E0AU4ihds91zEw.png">
+
+<link rel="canonical" href="https://lsc25846.github.io/LucasBlog.github.io/2022/05/10/%E4%BD%BF%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86%E8%A8%93%E7%B7%B4Mixed%20supervision%20for%20surface-defect%20detection/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>使用自己的資料集訓練Mixed supervision for surface-defect detection | Lucas's Bolg</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/LucasBlog.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lucas's Bolg</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">AI套膜仔的職場生存日記</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/LucasBlog.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/LucasBlog.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://lsc25846.github.io/LucasBlog.github.io/2022/05/10/%E4%BD%BF%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86%E8%A8%93%E7%B7%B4Mixed%20supervision%20for%20surface-defect%20detection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/LucasBlog.github.io/images/author-image.png">
+      <meta itemprop="name" content="Lucas Lin">
+      <meta itemprop="description" content="我有一百塊可以吃很多碗">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lucas's Bolg">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用自己的資料集訓練Mixed supervision for surface-defect detection
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2022-05-10 14:56:34" itemprop="dateCreated datePublished" datetime="2022-05-10T14:56:34+08:00">2022-05-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2024-01-09 17:31:05" itemprop="dateModified" datetime="2024-01-09T17:31:05+08:00">2024-01-09</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>接續上一篇文中所訓練的瑕疵檢測類神經網路，在原作者的版本中只能訓練他所提供的DAGM、KSDD、KSDD2、Steel資料集，來重現論文中所展示的成果。而作者也很貼心的在.&#x2F;datasets裡面的README.md中跟大家說該如何在Mixed supervision for surface-defect detection網路上訓練自己的資料集，</p>
+<span id="more"></span>
+<p><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*wNP_C8z6E0AU4ihds91zEw.png" alt="image_dataset"><br>所以這次就來試試看在這個瑕疵檢測的類神經網路上訓練自己的資料集吧!</p>
+<p>首先，作者提到想要訓練自己的資料集，最簡單的做法就只需要實作.&#x2F;data&#x2F;dataset.py 中的Dataset類別裡面的read_contents()，<br><img src="https://miro.medium.com/v2/resize:fit:640/format:webp/1*akc6yNf7PoE_rpaG1MIaPQ.png" alt="image_read_contents"><br>我的理解是這應該是一個抽象類別，需要呼叫時再來實作，所以在.&#x2F;data下面新增一個input_owndata.py<br><img src="https://miro.medium.com/v2/resize:fit:524/format:webp/1*VHxzAkOYtHUUmfe_60IClw.png" alt="image_input"></p>
+<p>接下來是我的實作方式，基本上依循KSDD2資料集的資料讀取方式，</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> data.dataset <span class="keyword">import</span> Dataset</span><br><span class="line"><span class="keyword">from</span> config <span class="keyword">import</span> Config</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    問題:需要有沒有標記的樣本，不然程式會出錯(dataset.py line 49)</span></span><br><span class="line"><span class="string">    可能需要重新標記</span></span><br><span class="line"><span class="string">    無標記樣本需要有一定數量程式才能動</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">OwnDataset</span>(<span class="title class_ inherited__">Dataset</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, kind: <span class="built_in">str</span>, cfg: Config</span>):</span><br><span class="line">        <span class="built_in">super</span>(OwnDataset, self).__init__(cfg.DATASET_PATH, cfg, kind)</span><br><span class="line">        self.read_contents()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">read_contents</span>(<span class="params">self</span>):</span><br><span class="line">        pos_samples, neg_samples = [], []</span><br><span class="line"></span><br><span class="line">        <span class="comment">#data_points = read_split(self.cfg.NUM_SEGMENTED, self.kind)</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        讀取資料夾下的所有影像</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        datalist=os.listdir(os.path.join(self.path,self.kind.lower()))</span><br><span class="line">        <span class="keyword">for</span> part <span class="keyword">in</span> datalist:</span><br><span class="line">            <span class="comment">#讀取資料夾中所有檔案</span></span><br><span class="line">            <span class="keyword">if</span> <span class="string">&quot;GT&quot;</span> <span class="keyword">not</span> <span class="keyword">in</span> part:</span><br><span class="line">            <span class="comment">#如果不是GT，抓取影像</span></span><br><span class="line">                part=part.replace(<span class="string">&#x27;.png&#x27;</span>,<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">                image_path = os.path.join(self.path, self.kind.lower(), <span class="string">f&quot;<span class="subst">&#123;part&#125;</span>.png&quot;</span>)</span><br><span class="line">                seg_mask_path = os.path.join(self.path, self.kind.lower(), <span class="string">f&quot;<span class="subst">&#123;part&#125;</span>_GT.png&quot;</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment">#如果是GT，跳過</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">            imagesize需要去config裡面新增</span></span><br><span class="line"><span class="string">            &#x27;&#x27;&#x27;</span></span><br><span class="line">            image = self.read_img_resize(image_path, self.grayscale, self.image_size)</span><br><span class="line">            seg_mask, positive = self.read_label_resize(seg_mask_path, self.image_size, self.cfg.DILATE)</span><br><span class="line">            is_segmented=<span class="literal">True</span></span><br><span class="line">            <span class="keyword">if</span> positive:</span><br><span class="line">                image = self.to_tensor(image)</span><br><span class="line">                seg_loss_mask = self.distance_transform(seg_mask, self.cfg.WEIGHTED_SEG_LOSS_MAX, self.cfg.WEIGHTED_SEG_LOSS_P)</span><br><span class="line">                seg_loss_mask = self.to_tensor(self.downsize(seg_loss_mask))</span><br><span class="line">                seg_mask = self.to_tensor(self.downsize(seg_mask))</span><br><span class="line">                pos_samples.append((image, seg_mask, seg_loss_mask, is_segmented, image_path, seg_mask_path, part))</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                image = self.to_tensor(image)</span><br><span class="line">                seg_loss_mask = self.to_tensor(self.downsize(np.ones_like(seg_mask)))</span><br><span class="line">                seg_mask = self.to_tensor(self.downsize(seg_mask))</span><br><span class="line">                neg_samples.append((image, seg_mask, seg_loss_mask, <span class="literal">True</span>, image_path, seg_mask_path, part))</span><br><span class="line"></span><br><span class="line">        self.pos_samples = pos_samples</span><br><span class="line">        self.neg_samples = neg_samples</span><br><span class="line"></span><br><span class="line">        self.num_pos = <span class="built_in">len</span>(pos_samples)</span><br><span class="line">        self.num_neg = <span class="built_in">len</span>(neg_samples)</span><br><span class="line">        self.<span class="built_in">len</span> = <span class="number">2</span> * <span class="built_in">len</span>(pos_samples) <span class="keyword">if</span> self.kind <span class="keyword">in</span> [<span class="string">&#x27;TRAIN&#x27;</span>] <span class="keyword">else</span> <span class="built_in">len</span>(pos_samples) + <span class="built_in">len</span>(neg_samples)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;pos,neg&quot;</span>,self.num_pos,self.num_neg)</span><br><span class="line">        self.init_extra()</span><br></pre></td></tr></table></figure>
+
+<p>這麼一來read_contents()的實作差不多就完成了；接下來需要在config.py以及dataset_catalog.py裡面新增owndata的選項，</p>
+<p>config.py:</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*hfdcYI1JclFHQEEb_o0mCg.png" alt="image_config.py"></p>
+<p>dataset_catalog.py:</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:640/format:webp/1*gJsOEVUlToViox9E28iuPg.png" alt="image_dataset_catalog.py"></p>
+<p>然後別忘了還要import我們的Owndataset</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:640/format:webp/1*78uwBA7JQ7tUAfzVMopzeg.png" alt="image_owndataset"></p>
+<p>這樣在讀資料的部分差不多是完成了，接下來我們看資料集的部分。在README.md裡面是這樣說的:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">All of our implementations of datasets use split_X_Y.pyb files to get the images which are used for certain training scenarios, however if you wish to use the code on your own data, there is no need to generate or use split files, all that matters is that you load the contents of the dataset as described above.</span><br></pre></td></tr></table></figure>
+
+<p>也就是說，訓練我們自己的資料集不需要去實現split_x_y.pyb的劃分，只需要把資料放好就可以了。聽起來好像很簡單呢，但是實際上我自己在使用時遇到了neg_imgs不足的問題，這是因為這篇論文是用於工業上的瑕疵檢測，所以預設在資料集中有許多的負樣本(沒有瑕疵的影像)，這導致我在輸入影像時全部輸入的都是正樣本(瑕疵影像)時出錯，這邊只需要輸入多一點負樣本(我是讓正樣本的比例壓到一半以下)就可以順利訓練了!</p>
+<p>這麼一來就可以成功訓練多，順帶一提，資料集擺放的方式也跟KSDD2一樣是把所有的影像跟Ground turth放在一起就可以囉!</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:640/format:webp/1*tg8dQMsiE3sjbEcV-Q_rSQ.png" alt="image_train"></p>
+<p>最後附上我fork原本專案出來實作的<a target="_blank" rel="noopener" href="https://github.com/lsc25846/mixed-segdec-net-comind2021">專案連結</a>，有錯誤還麻煩各位多多指正!</p>
+
+    </div>
+
+    
+    
+    
+        
+<!--
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>Lucas Lin
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://lsc25846.github.io/LucasBlog.github.io/2022/05/10/%E4%BD%BF%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86%E8%A8%93%E7%B7%B4Mixed%20supervision%20for%20surface-defect%20detection/" title="使用自己的資料集訓練Mixed supervision for surface-defect detection">https://lsc25846.github.io/LucasBlog.github.io/2022/05/10/使用自己的資料集訓練Mixed supervision for surface-defect detection/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+-->
+<div class="post-copyright d-flex">
+  <img class="site-author-image" itemprop="image" alt="Lucas Lin"
+        src="/LucasBlog.github.io/images/author-image.png">
+  <ul class="list-style-none">
+    <li class="post-copyright-author">
+      <strong>作者： </strong>Lucas Lin
+    </li>
+    <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://lsc25846.github.io/LucasBlog.github.io/2022/05/10/%E4%BD%BF%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86%E8%A8%93%E7%B7%B4Mixed%20supervision%20for%20surface-defect%20detection/" title="使用自己的資料集訓練Mixed supervision for surface-defect detection">https://lsc25846.github.io/LucasBlog.github.io/2022/05/10/使用自己的資料集訓練Mixed supervision for surface-defect detection/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+    </li>
+  </ul>
+</div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/LucasBlog.github.io/tags/Defect-Detection/" rel="tag"># Defect Detection</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/LucasBlog.github.io/2022/05/06/%E8%A1%A8%E9%9D%A2%E7%91%95%E7%96%B5%E6%AA%A2%E6%B8%AC/" rel="prev" title="Mixed supervision for surface-defect detection from weakly to fully supervised learning 表面瑕疵檢測">
+      <i class="fa fa-chevron-left"></i> Mixed supervision for surface-defect detection from weakly to fully supervised learning 表面瑕疵檢測
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/LucasBlog.github.io/2023/02/02/C-%E8%88%87Python%E6%BA%9D%E9%80%9A%E4%B8%A6%E4%B8%94%E5%82%B3%E9%80%81%E5%9C%96%E7%89%87%E7%9A%84%E6%96%B9%E6%B3%95%E7%B4%80%E9%8C%84/" rel="next" title="C#與Python溝通並且傳送圖片的方法紀錄">
+      C#與Python溝通並且傳送圖片的方法紀錄 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lucas Lin"
+      src="/LucasBlog.github.io/images/author-image.png">
+  <p class="site-author-name" itemprop="name">Lucas Lin</p>
+  <div class="site-description" itemprop="description">我有一百塊可以吃很多碗</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/LucasBlog.github.io/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">標籤</span>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/LucasBlog.github.io/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a target="_blank" rel="noopener" href='https://www.linkedin.com/in/lucas-lin-209a0a229/'>LucasLin</a></span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/LucasBlog.github.io/lib/anime.min.js"></script>
+  <script src="/LucasBlog.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/LucasBlog.github.io/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/LucasBlog.github.io/js/utils.js"></script>
+
+<script src="/LucasBlog.github.io/js/motion.js"></script>
+
+
+<script src="/LucasBlog.github.io/js/schemes/muse.js"></script>
+
+
+<script src="/LucasBlog.github.io/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

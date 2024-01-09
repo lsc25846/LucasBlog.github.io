@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/LucasBlog.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/LucasBlog.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/LucasBlog.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/LucasBlog.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/LucasBlog.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/LucasBlog.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lsc25846.github.io","root":"/LucasBlog.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="轉眼間進入職場也將近一年了，趁著過年有時間來記錄一下今年在職場中摸索出來的技術吧! C#與Python溝通的方式當今AOI(自動光學檢測)領域中似乎普遍都是使用C#來作為軟體開發的程式；伴隨著近年來越來越熱的AI話題，那如果想要在現有AOI機台上加入AI的檢測模式的話，就會需要能夠讓C#與Python溝通的手段了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C#與Python溝通並且傳送圖片的方法紀錄">
+<meta property="og:url" content="https://lsc25846.github.io/LucasBlog.github.io/2023/02/02/C-%E8%88%87Python%E6%BA%9D%E9%80%9A%E4%B8%A6%E4%B8%94%E5%82%B3%E9%80%81%E5%9C%96%E7%89%87%E7%9A%84%E6%96%B9%E6%B3%95%E7%B4%80%E9%8C%84/index.html">
+<meta property="og:site_name" content="Lucas&#39;s Bolg">
+<meta property="og:description" content="轉眼間進入職場也將近一年了，趁著過年有時間來記錄一下今年在職場中摸索出來的技術吧! C#與Python溝通的方式當今AOI(自動光學檢測)領域中似乎普遍都是使用C#來作為軟體開發的程式；伴隨著近年來越來越熱的AI話題，那如果想要在現有AOI機台上加入AI的檢測模式的話，就會需要能夠讓C#與Python溝通的手段了。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2023-02-02T06:10:10.000Z">
+<meta property="article:modified_time" content="2024-01-09T09:31:14.689Z">
+<meta property="article:author" content="Lucas Lin">
+<meta property="article:tag" content="Csharp">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Memory Mapp">
+<meta property="article:tag" content="Sockets">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://lsc25846.github.io/LucasBlog.github.io/2023/02/02/C-%E8%88%87Python%E6%BA%9D%E9%80%9A%E4%B8%A6%E4%B8%94%E5%82%B3%E9%80%81%E5%9C%96%E7%89%87%E7%9A%84%E6%96%B9%E6%B3%95%E7%B4%80%E9%8C%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>C#與Python溝通並且傳送圖片的方法紀錄 | Lucas's Bolg</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/LucasBlog.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lucas's Bolg</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">AI套膜仔的職場生存日記</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/LucasBlog.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/LucasBlog.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://lsc25846.github.io/LucasBlog.github.io/2023/02/02/C-%E8%88%87Python%E6%BA%9D%E9%80%9A%E4%B8%A6%E4%B8%94%E5%82%B3%E9%80%81%E5%9C%96%E7%89%87%E7%9A%84%E6%96%B9%E6%B3%95%E7%B4%80%E9%8C%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/LucasBlog.github.io/images/author-image.png">
+      <meta itemprop="name" content="Lucas Lin">
+      <meta itemprop="description" content="我有一百塊可以吃很多碗">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lucas's Bolg">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C#與Python溝通並且傳送圖片的方法紀錄
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2023-02-02 14:10:10" itemprop="dateCreated datePublished" datetime="2023-02-02T14:10:10+08:00">2023-02-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2024-01-09 17:31:14" itemprop="dateModified" datetime="2024-01-09T17:31:14+08:00">2024-01-09</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>轉眼間進入職場也將近一年了，趁著過年有時間來記錄一下今年在職場中摸索出來的技術吧!</p>
+<h2 id="C-與Python溝通的方式"><a href="#C-與Python溝通的方式" class="headerlink" title="C#與Python溝通的方式"></a>C#與Python溝通的方式</h2><p>當今AOI(自動光學檢測)領域中似乎普遍都是使用C#來作為軟體開發的程式；伴隨著近年來越來越熱的AI話題，那如果想要在現有AOI機台上加入AI的檢測模式的話，就會需要能夠讓C#與Python溝通的手段了。</p>
+<span id="more"></span>
+<p>而網路上存在的C#與Python溝通的方式最容易查詢到的，那肯定是<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42063091/article/details/82418630">C#調用Python的四種方法</a>了，筆者也是從此文章中提供的後面兩種方式再進行延伸的應用!</p>
+<p>這邊先簡單的梳理一下筆者所使用C#調用Python的方式:</p>
+<p>C#中建立一個Process &#x3D;&gt; 開啟python &#x3D;&gt; 透過Command line來進行簡單的溝通</p>
+<p>這樣的模式有點類似以前在使用小黑窗執行程式的概念，不過現在的使用者換成C#的程式端。這個方式不論是要執行的Python程式是.py檔或是.exe檔都可以順利執行(不過這邊還是推薦先使用.py檔進行撰寫 等到要讓程式上機的時候再改成.exe檔保護程式碼不外流喲!)</p>
+<p>以下程式碼顯示在C#中建立Process執行Python程式</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Process p = <span class="keyword">new</span> Process(); <span class="comment">//建立Process物件</span></span><br><span class="line"></span><br><span class="line">p.EnableRaisingEvents = <span class="literal">true</span>; <span class="comment">//是否在Process終止時觸發Exited</span></span><br><span class="line">p.StartInfo.UseShellExecute = <span class="literal">false</span>; <span class="comment">//是否要使用作業系統 Shell 來啟動處理序。</span></span><br><span class="line">p.StartInfo.RedirectStandardOutput = <span class="literal">true</span>; <span class="comment">//Python的文字輸出是否寫入至 StandardOutput 資料流</span></span><br><span class="line">p.StartInfo.FileName = <span class="string">&quot;cmd.exe&quot;</span>; <span class="comment">//使用cmd來執行</span></span><br><span class="line">p.StartInfo.RedirectStandardInput = <span class="literal">true</span>; <span class="comment">//Python的輸入是否從 StandardInput 資料流讀取。</span></span><br><span class="line">p.Start();</span><br><span class="line"></span><br><span class="line"><span class="built_in">string</span> cmd = <span class="string">@&quot;cd Python&quot;</span>; <span class="comment">//把路徑切換到想要執行的.py檔資料夾                </span></span><br><span class="line"><span class="built_in">string</span> cmd2 = <span class="string">@&quot;python CSharpConnectTest.py &quot;</span> + commend; <span class="comment">//執行.py檔</span></span><br><span class="line"></span><br><span class="line">StreamWriter myStreamWriter = p.StandardInput; <span class="comment">//建立寫入字串的物件</span></span><br><span class="line">myStreamWriter.WriteLine(cmd.ToString()); <span class="comment">//寫入字串               </span></span><br><span class="line">myStreamWriter.WriteLine(cmd2.ToString()); <span class="comment">//(這些字串的功能是讓cmd執行Python程式)</span></span><br></pre></td></tr></table></figure>
+
+<p>建立成功之後，就可以使用 p.StandardInput.WriteLine(“想要寫入的字串”) 與 p.StandardOutput.ReadLine() 來操作Python程式囉!</p>
+<h2 id="C-與Python傳送圖片的方法-一-Shared-memory"><a href="#C-與Python傳送圖片的方法-一-Shared-memory" class="headerlink" title="C#與Python傳送圖片的方法(一) - Shared memory"></a>C#與Python傳送圖片的方法(一) - Shared memory</h2><p>在實踐完上面提到的溝通方式之後，筆者馬上面臨到下一個問題，就是在這個應用之中，需要把影像傳送給Python進行分析；但是要怎麼傳給Python阿，如果去寫入一個資料夾再讀取take time直接爆炸，诶，既然寫入硬碟中不行，那我寫入記憶體不就好了嗎?</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">SharedMemory</span>(<span class="params"><span class="keyword">ref</span> Bitmap b</span>)</span> </span><br><span class="line">        &#123;</span><br><span class="line">            MemoryStream ms = <span class="keyword">new</span> MemoryStream(); <span class="comment">//建立支援的存放區為記憶體的資料流</span></span><br><span class="line">            b.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp); <span class="comment">//把圖片存入剛剛建立的記憶體</span></span><br><span class="line">            <span class="built_in">byte</span>[] bytes = ms.GetBuffer(); <span class="comment">//把剛剛的圖片轉成Byte讀出來</span></span><br><span class="line">            ms.Close(); <span class="comment">//記得關閉ms避免程式多次執行後崩潰</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">var</span> mmf = MemoryMappedFile.CreateOrOpen(<span class="string">&quot;test1&quot;</span>, bytes.Length, MemoryMappedFileAccess.ReadWrite); </span><br><span class="line">            <span class="comment">//在記憶體空間中寫入一個名叫&quot;test1&quot;的檔案並且指定長度</span></span><br><span class="line">            <span class="keyword">var</span> viewAccessor = mmf.CreateViewAccessor(<span class="number">0</span>, bytes.Length); <span class="comment">//建立對應於記憶體對應檔檢視的 MemoryMappedViewAccessor</span></span><br><span class="line">            viewAccessor.Write(<span class="number">0</span>, bytes.Length); ;</span><br><span class="line">            viewAccessor.WriteArray&lt;<span class="built_in">byte</span>&gt;(<span class="number">0</span>, bytes, <span class="number">0</span>, bytes.Length);</span><br><span class="line">            p.StandardInput.WriteLine(<span class="string">&quot;test1/&quot;</span> + bytes.Length.ToString()) <span class="comment">//這邊是自把建立的檔案名稱與長度告訴Python程式            </span></span><br><span class="line">            mmf.Dispose(); </span><br><span class="line">        &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>上面這段程式碼的功能是C#在記憶體中建立的一張影像，並且將影像的名稱與大小告訴Python。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import mmap</span><br><span class="line">import cv2</span><br><span class="line">import numpy <span class="keyword">as</span> np</span><br><span class="line">import matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">SharedMemory_Image</span>:</span><br><span class="line">    <span class="title">def</span> <span class="title">Read_Image</span>(<span class="title">file_name</span> = <span class="string">&#x27;test1&#x27;</span>,byteSize = <span class="number">10394</span>):</span><br><span class="line">        f = mmap.mmap(<span class="number">0</span>, byteSize, file_name, mmap.ACCESS_READ) <span class="meta">#根據名稱與大小讀取記憶體中的檔案</span></span><br><span class="line">        img = cv2.imdecode(np.frombuffer(f, np.uint8), cv2.IMREAD_COLOR) <span class="meta">#利用opencv中的解碼函式把Byte轉成影像檔</span></span><br><span class="line">        <span class="meta">#plt.imshow(img) </span></span><br><span class="line">        <span class="meta">#plt.show()</span></span><br><span class="line">        f.close()</span><br><span class="line">        <span class="keyword">return</span> img</span><br></pre></td></tr></table></figure>
+<p>而上面這段是筆者自己寫的Python讀取記憶體中的影像的Function，利用OpenCV的解碼功能可以非常快速的把影像從記憶體中讀出來(整體傳送圖片+解碼時間大約花費1<del>2毫秒)，take time不再爆炸拉</del></p>
+<p>Note:當然上面程式都是最基本僅有讀寫功能，實際上在改寫專案的時候遇到很多困難，像是: C#丟圖片太快導致程式崩潰、MultiThread C#的丟圖片時MemoryMappedFile在C#程式固定空間不夠導致讀取權限不足等等才是花費最多時間去解決的。</p>
+<h2 id="C-與Python傳送圖片的方法-二-—-Winsocket"><a href="#C-與Python傳送圖片的方法-二-—-Winsocket" class="headerlink" title="C#與Python傳送圖片的方法(二) — Winsocket"></a>C#與Python傳送圖片的方法(二) — Winsocket</h2><p>這邊介紹筆者實現的第二種傳送圖片的方式-透過Winsocket的方式來傳送影像。</p>
+<p>其實簡單來說就是利用網路來傳送圖片拉，不過Sever與Client都是自己電腦上的程式(大家一開始在寫網路程式的時候應該也是這樣練習的吧?)，首先在這裡的應用中，筆者把C#端程式視為Client端，Python端視為Sever端。</p>
+<p>C#作為Client端的程式碼如下:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"><span class="keyword">using</span> System.Threading.Tasks;</span><br><span class="line"><span class="keyword">using</span> System.Threading;</span><br><span class="line"><span class="keyword">using</span> System.Net.Sockets;</span><br><span class="line"><span class="keyword">using</span> System.Net;</span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System.Drawing;</span><br><span class="line"><span class="keyword">using</span> System.IO.MemoryMappedFiles;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">WinSocketTest_New</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//建立socket物件</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> Socket socket;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//</span></span><br><span class="line">            Console.WriteLine(<span class="string">&quot;請輸入ＩＰ&quot;</span>);</span><br><span class="line">            <span class="built_in">string</span> ip = Console.ReadLine();</span><br><span class="line">            <span class="comment">//</span></span><br><span class="line">            Console.WriteLine(<span class="string">&quot;請輸入端口號&quot;</span>);</span><br><span class="line">            <span class="built_in">int</span> port = <span class="built_in">int</span>.Parse(Console.ReadLine());</span><br><span class="line">            <span class="comment">//建立Client連線</span></span><br><span class="line">            ClientSocket(ip, port);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//建立Client連線</span></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">ClientSocket</span>(<span class="params"><span class="built_in">string</span> ip, <span class="built_in">int</span> port</span>)</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//指定Socket的資訊</span></span><br><span class="line">            socket = <span class="keyword">new</span> Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);</span><br><span class="line">            <span class="comment">//指定IP 與Port 並且讓Socket連線</span></span><br><span class="line">            IPAddress myIp = IPAddress.Parse(ip);</span><br><span class="line">            IPEndPoint point = <span class="keyword">new</span> IPEndPoint(myIp, port);</span><br><span class="line">            socket.Connect(point);</span><br><span class="line">            <span class="comment">//確認是否連線</span></span><br><span class="line">            <span class="keyword">if</span> (socket.Connected)</span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(<span class="string">&quot;Connect Succese! &quot;</span> + socket.RemoteEndPoint.ToString());                </span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//把傳送訊息與接收訊息並且顯示做為兩個執行續進行</span></span><br><span class="line">            Thread sendMsg = <span class="keyword">new</span> Thread(SendMsgToServer);</span><br><span class="line">            Thread ReceiveMsg = <span class="keyword">new</span> Thread(ReceiveMsgFromServer);</span><br><span class="line">            ReceiveMsg.IsBackground = <span class="literal">true</span>;</span><br><span class="line">            ReceiveMsg.Start();</span><br><span class="line">            sendMsg.Start();</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">SendMsgToServer</span>()</span></span><br><span class="line">        &#123;            </span><br><span class="line">            <span class="comment">//輸入要傳送的影像的路徑</span></span><br><span class="line">            <span class="built_in">byte</span>[] SendByte = ImageToByte(<span class="string">@&quot;C:\Path\To\Your\Image&quot;</span>);</span><br><span class="line">            <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">//隨便發送一個文字就傳送影像</span></span><br><span class="line">                <span class="built_in">string</span> inputText = Console.ReadLine();</span><br><span class="line">                <span class="built_in">byte</span>[] buffer = System.Text.Encoding.UTF8.GetBytes(inputText);</span><br><span class="line">                socket.Send(SendByte);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">ReceiveMsgFromServer</span>()</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">byte</span>[] buffer = <span class="keyword">new</span> <span class="built_in">byte</span>[<span class="number">1024</span>];</span><br><span class="line">                <span class="built_in">int</span> rec = socket.Receive(buffer);</span><br><span class="line">                <span class="keyword">if</span> (rec == <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    Console.WriteLine(<span class="string">&quot;Server Loss!&quot;</span>);                    </span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="built_in">string</span> receText = System.Text.Encoding.UTF8.GetString(buffer, <span class="number">0</span>, rec);</span><br><span class="line">                Console.WriteLine(<span class="string">&quot;Server :&quot;</span> + receText);</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//把Bitmap圖片轉成Byte[]</span></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="built_in">byte</span>[] <span class="title">ImageToByte</span>(<span class="params"><span class="built_in">string</span> path</span>)</span> </span><br><span class="line">        &#123;</span><br><span class="line">            Bitmap Image = <span class="keyword">new</span> Bitmap(path);</span><br><span class="line">            MemoryStream ms = <span class="keyword">new</span> MemoryStream();</span><br><span class="line">            Image.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);</span><br><span class="line">            <span class="built_in">byte</span>[] bytes = ms.GetBuffer();</span><br><span class="line">            ms.Close();</span><br><span class="line">            <span class="keyword">return</span> bytes;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而Python作為Server端的程式碼則如下:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line">import cv2</span><br><span class="line">import numpy <span class="keyword">as</span> np</span><br><span class="line">import matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">Bind_ip = <span class="string">&#x27;127.0.0.1&#x27;</span></span><br><span class="line">Bind_port = <span class="number">1000</span></span><br><span class="line">server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)</span><br><span class="line"></span><br><span class="line">server.bind((Bind_ip,Bind_port))</span><br><span class="line">server.listen(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">print (<span class="string">&quot;[*] Listening on %s:%d &quot;</span> % (Bind_ip,Bind_port))</span><br><span class="line">Images = []</span><br><span class="line"><span class="keyword">while</span> True:</span><br><span class="line">    client,addr = server.accept()</span><br><span class="line">    print (<span class="string">&#x27;Connected by &#x27;</span>, addr)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> True:</span><br><span class="line">        <span class="meta">#這邊可以輸入傳送影像的大小，也可以輸入固定超過影像大小的數字</span></span><br><span class="line">        data = client.recv(<span class="number">10485750</span>)</span><br><span class="line">        <span class="meta">#收到影像資料之後使用opencv進行解碼，將byte轉換成影像        </span></span><br><span class="line">        img_byte = np.frombuffer(data, np.uint8)</span><br><span class="line">        img = cv2.imdecode(img_byte, cv2.IMREAD_COLOR)</span><br><span class="line">        plt.imshow(img)</span><br><span class="line">        plt.show()</span><br></pre></td></tr></table></figure>
+<p>這樣就可以透過Winsocket 在C#與Python之間傳送影像囉!</p>
+<p>使用Winsocket的優點就是傳送影像不限制在同一台電腦上，透過設定可以傳送到在同一區域網路中的電腦上；而缺點則是速度上會輸給分享記憶體的方法。</p>
+<h2 id="後記"><a href="#後記" class="headerlink" title="後記"></a>後記</h2><p>現在許多領域都想要與AI沾上邊，透過AI來解決問題；而AI程式大多選擇使用Python撰寫，所以也擁有最多的資源；想要在原有系統上增加AI功能就勢必需要透過某些手段來讓不同程式進行溝通。其實在查詢資料時還有發現其他作法，像是Tensorflow.net，但是考量到摸熟需要時間以及死線的壓力，誤打誤撞摸出今天講的這些方法。</p>
+<hr>
+<p>[參考資料]</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42063091/article/details/82418630">C#調用Python的四種方法</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.51cto.com/u_15088375/4531992">C#通过共享内存传图像数据给python</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10205819">Day-12 Python_Socket小實作</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+<!--
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>作者： </strong>Lucas Lin
+  </li>
+  <li class="post-copyright-link">
+    <strong>文章連結：</strong>
+    <a href="https://lsc25846.github.io/LucasBlog.github.io/2023/02/02/C-%E8%88%87Python%E6%BA%9D%E9%80%9A%E4%B8%A6%E4%B8%94%E5%82%B3%E9%80%81%E5%9C%96%E7%89%87%E7%9A%84%E6%96%B9%E6%B3%95%E7%B4%80%E9%8C%84/" title="C#與Python溝通並且傳送圖片的方法紀錄">https://lsc25846.github.io/LucasBlog.github.io/2023/02/02/C-與Python溝通並且傳送圖片的方法紀錄/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+  </li>
+</ul>
+</div>
+-->
+<div class="post-copyright d-flex">
+  <img class="site-author-image" itemprop="image" alt="Lucas Lin"
+        src="/LucasBlog.github.io/images/author-image.png">
+  <ul class="list-style-none">
+    <li class="post-copyright-author">
+      <strong>作者： </strong>Lucas Lin
+    </li>
+    <li class="post-copyright-link">
+      <strong>文章連結：</strong>
+      <a href="https://lsc25846.github.io/LucasBlog.github.io/2023/02/02/C-%E8%88%87Python%E6%BA%9D%E9%80%9A%E4%B8%A6%E4%B8%94%E5%82%B3%E9%80%81%E5%9C%96%E7%89%87%E7%9A%84%E6%96%B9%E6%B3%95%E7%B4%80%E9%8C%84/" title="C#與Python溝通並且傳送圖片的方法紀錄">https://lsc25846.github.io/LucasBlog.github.io/2023/02/02/C-與Python溝通並且傳送圖片的方法紀錄/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
+    </li>
+  </ul>
+</div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/LucasBlog.github.io/tags/Csharp/" rel="tag"># Csharp</a>
+              <a href="/LucasBlog.github.io/tags/Python/" rel="tag"># Python</a>
+              <a href="/LucasBlog.github.io/tags/Memory-Mapp/" rel="tag"># Memory Mapp</a>
+              <a href="/LucasBlog.github.io/tags/Sockets/" rel="tag"># Sockets</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/LucasBlog.github.io/2022/05/10/%E4%BD%BF%E7%94%A8%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86%E8%A8%93%E7%B7%B4Mixed%20supervision%20for%20surface-defect%20detection/" rel="prev" title="使用自己的資料集訓練Mixed supervision for surface-defect detection">
+      <i class="fa fa-chevron-left"></i> 使用自己的資料集訓練Mixed supervision for surface-defect detection
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E8%88%87Python%E6%BA%9D%E9%80%9A%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">C#與Python溝通的方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E8%88%87Python%E5%82%B3%E9%80%81%E5%9C%96%E7%89%87%E7%9A%84%E6%96%B9%E6%B3%95-%E4%B8%80-Shared-memory"><span class="nav-number">2.</span> <span class="nav-text">C#與Python傳送圖片的方法(一) - Shared memory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-%E8%88%87Python%E5%82%B3%E9%80%81%E5%9C%96%E7%89%87%E7%9A%84%E6%96%B9%E6%B3%95-%E4%BA%8C-%E2%80%94-Winsocket"><span class="nav-number">3.</span> <span class="nav-text">C#與Python傳送圖片的方法(二) — Winsocket</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%8C%E8%A8%98"><span class="nav-number">4.</span> <span class="nav-text">後記</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lucas Lin"
+      src="/LucasBlog.github.io/images/author-image.png">
+  <p class="site-author-name" itemprop="name">Lucas Lin</p>
+  <div class="site-description" itemprop="description">我有一百塊可以吃很多碗</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/LucasBlog.github.io/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">標籤</span>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/LucasBlog.github.io/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"><a target="_blank" rel="noopener" href='https://www.linkedin.com/in/lucas-lin-209a0a229/'>LucasLin</a></span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/LucasBlog.github.io/lib/anime.min.js"></script>
+  <script src="/LucasBlog.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/LucasBlog.github.io/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/LucasBlog.github.io/js/utils.js"></script>
+
+<script src="/LucasBlog.github.io/js/motion.js"></script>
+
+
+<script src="/LucasBlog.github.io/js/schemes/muse.js"></script>
+
+
+<script src="/LucasBlog.github.io/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
