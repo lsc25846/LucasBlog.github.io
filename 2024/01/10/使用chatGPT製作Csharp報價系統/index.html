@@ -20,24 +20,26 @@
     var CONFIG = {"hostname":"lsc25846.github.io","root":"/LucasBlog.github.io/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="上一次安裝執行UNet後發現milesial的UNet在我的應用上(多種類別的語意分割)還蠻不方便的；在搜尋多種類別的UNet時看到了UNet++作者本人的介紹，真是醍醐灌頂阿，大神跟我這種凡人的思維真的是天差地遠呢。 廢話講的有點多，還是趕快來記錄今天的Nested UNet安裝與執行吧!">
-<meta property="og:type" content="article">
-<meta property="og:title" content="UNet++(Nested UNet)安裝紀錄">
-<meta property="og:url" content="https://lsc25846.github.io/LucasBlog.github.io/2022/04/27/UNet++(Nested%20UNet)%E5%AE%89%E8%A3%9D%E7%B4%80%E9%8C%84/index.html">
+  <meta property="og:type" content="article">
+<meta property="og:title" content="使用chat GPT製作C# 報價系統">
+<meta property="og:url" content="https://lsc25846.github.io/LucasBlog.github.io/2024/01/10/%E4%BD%BF%E7%94%A8chatGPT%E8%A3%BD%E4%BD%9CCsharp%E5%A0%B1%E5%83%B9%E7%B3%BB%E7%B5%B1/index.html">
 <meta property="og:site_name" content="Lucas&#39;s Bolg">
-<meta property="og:description" content="上一次安裝執行UNet後發現milesial的UNet在我的應用上(多種類別的語意分割)還蠻不方便的；在搜尋多種類別的UNet時看到了UNet++作者本人的介紹，真是醍醐灌頂阿，大神跟我這種凡人的思維真的是天差地遠呢。 廢話講的有點多，還是趕快來記錄今天的Nested UNet安裝與執行吧!">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*yzZZVxHnOiHqgw8SI2iPlg.png">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:720/format:webp/1*7A6fuoeQWftn2cj0zaXjKQ.png">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*KYWrkR9LAMQ142wbEt9OHQ.png">
-<meta property="article:published_time" content="2022-04-27T09:53:44.000Z">
-<meta property="article:modified_time" content="2024-01-09T14:42:18.752Z">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:4800/format:webp/1*XsJcL7P7_AGNB2xG3letMw.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:720/format:webp/1*xaWjnsaKGGWExGp1HgDOOQ.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*icedmQhO4_uXG34EuZLdeg.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*p7N5AC6Nx1YUZrIszSsXdw.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*pUndWUUcOe4lny-HuTCf6g.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:720/format:webp/1*Ncd0f9toY2kqTGR_3YwJFQ.png">
+<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*Kh-1kqY2KrgjmO7j_0G5Bw.png">
+<meta property="article:published_time" content="2024-01-10T06:21:52.000Z">
+<meta property="article:modified_time" content="2024-01-10T06:34:49.101Z">
 <meta property="article:author" content="Lucas Lin">
-<meta property="article:tag" content="Deep Learning">
+<meta property="article:tag" content="Csharp">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*yzZZVxHnOiHqgw8SI2iPlg.png">
+<meta name="twitter:image" content="https://miro.medium.com/v2/resize:fit:4800/format:webp/1*XsJcL7P7_AGNB2xG3letMw.png">
 
-<link rel="canonical" href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/27/UNet++(Nested%20UNet)%E5%AE%89%E8%A3%9D%E7%B4%80%E9%8C%84/">
+<link rel="canonical" href="https://lsc25846.github.io/LucasBlog.github.io/2024/01/10/%E4%BD%BF%E7%94%A8chatGPT%E8%A3%BD%E4%BD%9CCsharp%E5%A0%B1%E5%83%B9%E7%B3%BB%E7%B5%B1/">
 
 
 <script id="page-configurations">
@@ -50,7 +52,7 @@
   };
 </script>
 
-  <title>UNet++(Nested UNet)安裝紀錄 | Lucas's Bolg</title>
+  <title>使用chat GPT製作C# 報價系統 | Lucas's Bolg</title>
   
 
 
@@ -162,7 +164,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/27/UNet++(Nested%20UNet)%E5%AE%89%E8%A3%9D%E7%B4%80%E9%8C%84/">
+    <link itemprop="mainEntityOfPage" href="https://lsc25846.github.io/LucasBlog.github.io/2024/01/10/%E4%BD%BF%E7%94%A8chatGPT%E8%A3%BD%E4%BD%9CCsharp%E5%A0%B1%E5%83%B9%E7%B3%BB%E7%B5%B1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/LucasBlog.github.io/images/author-image.png">
@@ -175,7 +177,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          UNet++(Nested UNet)安裝紀錄
+          使用chat GPT製作C# 報價系統
         </h1>
 
         <div class="post-meta">
@@ -184,23 +186,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">發表於</span>
+              
 
-              <time title="創建時間：2022-04-27 17:53:44" itemprop="dateCreated datePublished" datetime="2022-04-27T17:53:44+08:00">2022-04-27</time>
+              <time title="創建時間：2024-01-10 14:21:52 / 修改時間：14:34:49" itemprop="dateCreated datePublished" datetime="2024-01-10T14:21:52+08:00">2024-01-10</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2024-01-09 22:42:18" itemprop="dateModified" datetime="2024-01-09T22:42:18+08:00">2024-01-09</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分類於</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/LucasBlog.github.io/categories/Deep-Learning/" itemprop="url" rel="index"><span itemprop="name">Deep Learning</span></a>
+                  <a href="/LucasBlog.github.io/categories/Csharp/" itemprop="url" rel="index"><span itemprop="name">Csharp</span></a>
                 </span>
             </span>
 
@@ -215,49 +211,29 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>上一次安裝執行UNet後發現<a target="_blank" rel="noopener" href="https://github.com/milesial">milesial</a>的UNet在我的應用上(多種類別的語意分割)還蠻不方便的；在搜尋多種類別的UNet時看到了UNet++作者本人的<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/44958351">介紹</a>，真是醍醐灌頂阿，大神跟我這種凡人的思維真的是天差地遠呢。</p>
-<p>廢話講的有點多，還是趕快來記錄今天的Nested UNet安裝與執行吧!</p>
+        <p><img src="https://miro.medium.com/v2/resize:fit:4800/format:webp/1*XsJcL7P7_AGNB2xG3letMw.png" alt="image_MainWindow"></p>
 <span id="more"></span>
-<p>##環境:<br>OS: Windows10</p>
-<p>PyTorch: 1.11.0</p>
-<p>CUDA: 11.3</p>
-<p>##GitHub:<br><a target="_blank" rel="noopener" href="https://github.com/zonasw/unet-nested-multiple-classification">unet-nested-multiple-classification</a><br>一樣先把程式碼下載下來解壓縮</p>
-<p>然後依照作者的方式把資料安放好</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">data</span><br><span class="line">├── images</span><br><span class="line">|   ├── 0a7e06.jpg</span><br><span class="line">│   ├── 0aab0a.jpg</span><br><span class="line">│   ├── 0b1761.jpg</span><br><span class="line">│   ├── ...</span><br><span class="line">|</span><br><span class="line">└── masks</span><br><span class="line">    ├── 0a7e06.png</span><br><span class="line">    ├── 0aab0a.png</span><br><span class="line">    ├── 0b1761.png</span><br><span class="line">    ├── ...</span><br></pre></td></tr></table></figure>
-<p>跟UNet一樣images裡面放訓練的影像，masks裡面放對應影像的遮罩。</p>
-<p>注意這邊的images裡面要放三維的影像，而masks裡面則是放一維的影像。</p>
-<p>然後一樣打開Anaconda Prompt ，cd到資料夾裡面，出槍試瞄</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python train.py </span><br></pre></td></tr></table></figure>
-<p>然後就開始訓練了</p>
-<p>因為大部分的坑在上一次訓練UNet就踩過了，所以這次訓練的前置作業特別順利，幾乎沒出甚麼問題，除了…</p>
-<p>RuntimeError: CUDA out of memory.</p>
-<p>跟</p>
-<p>OSError:[winerror 1455] 分頁檔太小 無法完成操作。</p>
-<p>之外</p>
-<p>不過這兩個也算好解決，RuntimeError: CUDA out of memory. 就是指GPU的記憶體滿了，在config.py裡面把batch_size設小一點就可以了(我設成1)；</p>
-<p>而OSError:[winerror 1455] 分頁檔太小 無法完成操作。則是CPU這邊的記憶體分頁大小不夠，需要修改train.py裡面的num_worker參數，一樣設定小一點就沒問題了。</p>
-<p>num_worker數大概是每次載入時，dataload會創建num_worker個執行序，batch_sampler指派batch給worker，worker負責將batch載入RAM裡面。</p>
-<p>蛤 看不懂嗎</p>
-<p>反正大概意思是</p>
-<p>工頭(dataload)叫來工人(num_worker)來幫忙搬貨(batch，本實驗中就是一批影像)，工人把貨搬到倉庫(RAM)裡面。這時候叫太多工人來搬，可是倉庫出貨的速度跟不上時，倉庫(RAM裡面的分頁)就會爆掉；反過來說，如果只找一個人來搬，倉庫消耗的速度會大於搬入的速度，導致工人要一直不斷的搬貨，而學過計算機組織的大家應該都知道到頻繁到硬碟裡面搬資料會造成程式執行速度出現瓶頸。</p>
-<p>講不精確的地方還請大老多多指教。</p>
-<p>總之，現在已經可以在UNet++上訓練自己的資料集了!</p>
-<p>但是想要把模型訓練好，還有很多事情需要完成，像是分析訓練結果、改善參數等等。還好這個版本有在程式裡加入一個非常實用的監控方法:</p>
-<p>Tensorboard!!</p>
-<p>在使用這個超方便的監控面板前，有一件重要的事要先做</p>
-<p>沒錯! 安裝!</p>
-<p>一樣打開我們熟悉的Anaconda Prompt</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install tensorboardX</span><br></pre></td></tr></table></figure>
-<p>安裝完成後 一樣cd到專案目錄</p>
-<p>裡面有一個runs資料夾 如果你有跑訓練看起來應該會像這樣<br><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*yzZZVxHnOiHqgw8SI2iPlg.png" alt="image_runs"><br>每跑過一次訓練，程式會自動記錄下來訓練的內容(loss等)</p>
-<p>我們就要把這些內容放到Tensorboard上面來檢視</p>
-<p>以上面資料夾為例就是</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tensorboard --logdir=./run\Apr25_....</span><br></pre></td></tr></table></figure>
-<p>tensorboard會自動去讀取記錄下來的log檔</p>
-<p><img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*7A6fuoeQWftn2cj0zaXjKQ.png" alt="image_tensorboard_cmd"></p>
-<p>接下來在瀏覽器上輸入 <a target="_blank" rel="noopener" href="http://loaclhost:6006/">http://loaclhost:6006/</a><br><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*KYWrkR9LAMQ142wbEt9OHQ.png" alt="image_tensorboard"></p>
-<p>就可以從中看到各種訓練的數據拉!</p>
-<p>今天的紀錄就到這邊了，如果有錯誤還請留言指正，一起討論學習!</p>
+<h2 id="使用C-實做一個股票報價系統"><a href="#使用C-實做一個股票報價系統" class="headerlink" title="使用C#實做一個股票報價系統"></a>使用C#實做一個股票報價系統</h2><p>下圖是此系統的運作流程:<br><img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*xaWjnsaKGGWExGp1HgDOOQ.png" alt="image_FlowChart"></p>
+<p>報價系統作(Client端)用為顯示股價等資訊，可以透過下方的滑動鈕來調整畫面更新的頻率。</p>
+<p>股價推送伺服器(Server端)則隨機生成股價資訊，透過Socket推送給連接上的Client端。</p>
+<p>以下為此專案的程式碼</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/lsc25846/StockServer">Server</a><br><a target="_blank" rel="noopener" href="https://github.com/lsc25846/TradeView">Client</a></p>
+<p>專案中，使用自己撰寫的Socket物件<a target="_blank" rel="noopener" href="https://github.com/lsc25846/StockServer/blob/master/StockServer/StockDataServer.cs">SocketDataServer</a>與<a target="_blank" rel="noopener" href="https://github.com/lsc25846/TradeView/blob/master/TradeView/SocketDataClient.cs">SocketDataClient</a>來進行Socket綁定、傳送數據。</p>
+<p>為了達到可以隨著不同頻率更新數據(10ms~3000ms)，我讓Server端像是廣播一般的發送數據，而Client端則接收完數據後暫存在Buffer之中。這樣會發生兩種狀況</p>
+<p>1.下一筆資料已經接收到，則覆蓋當前資料。<br>2.Timer計數時間到，更新畫面資料。<br>透過這種方法來實現調整更新頻率。</p>
+<p>專案中也有加入Log紀錄，並且讓Log紀錄指向Socket物件；這樣做的好處是不會有很多個Thread同時在寫入同一個文字檔案。</p>
+<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式:"></a>使用方式:</h2><p>Step1.啟動Server</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*icedmQhO4_uXG34EuZLdeg.png" alt="image_ServerFrom1"><br>這個Server視窗可以設定IP與Port建立連線，可以連線到區域網路中的對應IP，這邊設定連線到自己的主機 127.0.0.1 port 5566</p>
+<p><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*p7N5AC6Nx1YUZrIszSsXdw.png" alt="image_ServerFrom2"><br>按下啟動按鈕後，變為綠色則為啟動Server成功。</p>
+<p>Step2.Client進行連線<br><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*pUndWUUcOe4lny-HuTCf6g.png" alt="image_ServerFrom3"><br>輸入Server的IP與Port後按下連接</p>
+<p>若是連線成功則按鈕會變為連線中的樣式<br><img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*Ncd0f9toY2kqTGR_3YwJFQ.png" alt="image_ServerFrom4"></p>
+<p>如果輸入錯誤的IP與Port則會出現錯誤視窗<br><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*Kh-1kqY2KrgjmO7j_0G5Bw.png" alt="image_ServerFrom5"><br>啟動後可以透過滑動鈕來選擇更新頻率；Log檔案可以在Debug路徑下找到</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TradeView\TradeView\bin\Debug\net8.0-windows\logfile.txt</span><br></pre></td></tr></table></figure>
+<p>以上是本專案的操作順序。</p>
+<h2 id="後記"><a href="#後記" class="headerlink" title="後記"></a>後記</h2><p>這個專案是某個銀行證券IT部門的面試作業，但是我在交出後就被告知因為使用ChatGPT，而他們內部是不能使用GPT的，所以能力可能沒有達到預期；幫我內推的學長跟我說主管會再找時間聯絡我，然後到目前為止都沒有消息了。</p>
+<p>收到這個消息的時候覺得非常無言，也覺得對不起幫我內推的學長；作業上沒有寫禁止使用ChatGPT來輔助撰寫程式，而我用最快的方式完成作業應該是合情合理吧?</p>
+<p>我自己認為程式架構算是合理、也可以知道這是一個有點OOP概念的人寫出來的專案； 不使用GPT來實作就只是作業時間會拉長很多以及很醜的命名風格、部分不乾淨的程式。這樣就被打槍實在是…讓我上了一課。</p>
+<p>總之，要記得以後看面試的公司類型、工作資訊後再決定要交出甚麼樣的作業才是上策。</p>
 
     </div>
 
@@ -273,7 +249,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>文章連結：</strong>
-    <a href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/27/UNet++(Nested%20UNet)%E5%AE%89%E8%A3%9D%E7%B4%80%E9%8C%84/" title="UNet++(Nested UNet)安裝紀錄">https://lsc25846.github.io/LucasBlog.github.io/2022/04/27/UNet++(Nested UNet)安裝紀錄/</a>
+    <a href="https://lsc25846.github.io/LucasBlog.github.io/2024/01/10/%E4%BD%BF%E7%94%A8chatGPT%E8%A3%BD%E4%BD%9CCsharp%E5%A0%B1%E5%83%B9%E7%B3%BB%E7%B5%B1/" title="使用chat GPT製作C# 報價系統">https://lsc25846.github.io/LucasBlog.github.io/2024/01/10/使用chatGPT製作Csharp報價系統/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
@@ -290,7 +266,7 @@
     </li>
     <li class="post-copyright-link">
       <strong>文章連結：</strong>
-      <a href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/27/UNet++(Nested%20UNet)%E5%AE%89%E8%A3%9D%E7%B4%80%E9%8C%84/" title="UNet++(Nested UNet)安裝紀錄">https://lsc25846.github.io/LucasBlog.github.io/2022/04/27/UNet++(Nested UNet)安裝紀錄/</a>
+      <a href="https://lsc25846.github.io/LucasBlog.github.io/2024/01/10/%E4%BD%BF%E7%94%A8chatGPT%E8%A3%BD%E4%BD%9CCsharp%E5%A0%B1%E5%83%B9%E7%B3%BB%E7%B5%B1/" title="使用chat GPT製作C# 報價系統">https://lsc25846.github.io/LucasBlog.github.io/2024/01/10/使用chatGPT製作Csharp報價系統/</a>
     </li>
     <li class="post-copyright-license">
       <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
@@ -300,7 +276,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/LucasBlog.github.io/tags/Deep-Learning/" rel="tag"># Deep Learning</a>
+              <a href="/LucasBlog.github.io/tags/Csharp/" rel="tag"># Csharp</a>
           </div>
 
         
@@ -309,13 +285,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/" rel="prev" title="在Win10上執行PyTorch版本的UNet訓練自己的資料集">
-      <i class="fa fa-chevron-left"></i> 在Win10上執行PyTorch版本的UNet訓練自己的資料集
+    <a href="/LucasBlog.github.io/2023/02/02/C-%E8%88%87Python%E6%BA%9D%E9%80%9A%E4%B8%A6%E4%B8%94%E5%82%B3%E9%80%81%E5%9C%96%E7%89%87%E7%9A%84%E6%96%B9%E6%B3%95%E7%B4%80%E9%8C%84/" rel="prev" title="C#與Python溝通並且傳送圖片的方法紀錄">
+      <i class="fa fa-chevron-left"></i> C#與Python溝通並且傳送圖片的方法紀錄
     </a></div>
-      <div class="post-nav-item">
-    <a href="/LucasBlog.github.io/2022/05/06/%E8%A1%A8%E9%9D%A2%E7%91%95%E7%96%B5%E6%AA%A2%E6%B8%AC/" rel="next" title="Mixed supervision for surface-defect detection from weakly to fully supervised learning 表面瑕疵檢測">
-      Mixed supervision for surface-defect detection from weakly to fully supervised learning 表面瑕疵檢測 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -374,6 +347,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8C-%E5%AF%A6%E5%81%9A%E4%B8%80%E5%80%8B%E8%82%A1%E7%A5%A8%E5%A0%B1%E5%83%B9%E7%B3%BB%E7%B5%B1"><span class="nav-number">1.</span> <span class="nav-text">使用C#實做一個股票報價系統</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">使用方式:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%8C%E8%A8%98"><span class="nav-number">3.</span> <span class="nav-text">後記</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
