@@ -20,28 +20,22 @@
     var CONFIG = {"hostname":"lsc25846.github.io","root":"/LucasBlog.github.io/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="上一次在Win10上安裝完了CUDA+Pytorch 今天就來記錄在這裝置上執行UNet遇到的事情 今天要執行的是這一版本的UNet: milesial">
+  <meta name="description" content="因為自己開始撰寫部落格以及對於Web3的興趣，所以在閒暇之餘學習了HTML、CSS與JavaScript的基礎知識，想利用這篇文章來記錄避免以後忘記。我是透過Net Ninja的HTML與CSS教學來一步一步學習的，Net Ninja的教學非常推薦!由淺到深(但也沒有很深)的講解加上漂亮的簡報讓我看得非常舒服~相信0基礎的新手也可以快速上手的!">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在Win10上執行PyTorch版本的UNet訓練自己的資料集">
-<meta property="og:url" content="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/index.html">
+<meta property="og:title" content="使用HTML與CSS來建立靜態網站-會員制餐廳官方網站">
+<meta property="og:url" content="https://lsc25846.github.io/LucasBlog.github.io/2024/01/18/%E9%A4%90%E5%BB%B3/index.html">
 <meta property="og:site_name" content="Lucas&#39;s Bolg">
-<meta property="og:description" content="上一次在Win10上安裝完了CUDA+Pytorch 今天就來記錄在這裝置上執行UNet遇到的事情 今天要執行的是這一版本的UNet: milesial">
+<meta property="og:description" content="因為自己開始撰寫部落格以及對於Web3的興趣，所以在閒暇之餘學習了HTML、CSS與JavaScript的基礎知識，想利用這篇文章來記錄避免以後忘記。我是透過Net Ninja的HTML與CSS教學來一步一步學習的，Net Ninja的教學非常推薦!由淺到深(但也沒有很深)的講解加上漂亮的簡報讓我看得非常舒服~相信0基礎的新手也可以快速上手的!">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*uvtqY9fUxXBMAovqkXWX5g.jpeg">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*u0ffSTtzYCXc72qjFdihgQ.gif">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*tsX9TEeWp2Y5V2LNPjn6fg.jpeg">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*_4WIY-UyfOZmQeiTc86XSA.jpeg">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*0xnzx0i6NedO5ZS_o1QL3A.png">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:720/format:webp/1*HOHZ7alaq6PFAgF3gHZyPg.png">
-<meta property="og:image" content="https://miro.medium.com/v2/resize:fit:640/format:webp/1*hK28n3DfOC4KT-SKEZVl1Q.png">
-<meta property="article:published_time" content="2022-04-22T10:00:24.000Z">
-<meta property="article:modified_time" content="2024-01-09T14:42:14.369Z">
+<meta property="article:published_time" content="2024-01-18T10:10:45.000Z">
+<meta property="article:modified_time" content="2024-01-23T07:32:09.133Z">
 <meta property="article:author" content="Lucas Lin">
-<meta property="article:tag" content="Deep Learning">
+<meta property="article:tag" content="Side Project">
+<meta property="article:tag" content="HTML">
+<meta property="article:tag" content="CSS">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*uvtqY9fUxXBMAovqkXWX5g.jpeg">
 
-<link rel="canonical" href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/">
+<link rel="canonical" href="https://lsc25846.github.io/LucasBlog.github.io/2024/01/18/%E9%A4%90%E5%BB%B3/">
 
 
 <script id="page-configurations">
@@ -54,7 +48,7 @@
   };
 </script>
 
-  <title>在Win10上執行PyTorch版本的UNet訓練自己的資料集 | Lucas's Bolg</title>
+  <title>使用HTML與CSS來建立靜態網站-會員制餐廳官方網站 | Lucas's Bolg</title>
   
 
 
@@ -166,7 +160,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
-    <link itemprop="mainEntityOfPage" href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/">
+    <link itemprop="mainEntityOfPage" href="https://lsc25846.github.io/LucasBlog.github.io/2024/01/18/%E9%A4%90%E5%BB%B3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/LucasBlog.github.io/images/author-image.png">
@@ -179,7 +173,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          在Win10上執行PyTorch版本的UNet訓練自己的資料集
+          使用HTML與CSS來建立靜態網站-會員制餐廳官方網站
         </h1>
 
         <div class="post-meta">
@@ -189,14 +183,14 @@
               </span>
               <span class="post-meta-item-text">發表於</span>
 
-              <time title="創建時間：2022-04-22 18:00:24" itemprop="dateCreated datePublished" datetime="2022-04-22T18:00:24+08:00">2022-04-22</time>
+              <time title="創建時間：2024-01-18 18:10:45" itemprop="dateCreated datePublished" datetime="2024-01-18T18:10:45+08:00">2024-01-18</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2024-01-09 22:42:14" itemprop="dateModified" datetime="2024-01-09T22:42:14+08:00">2024-01-09</time>
+                <time title="修改時間：2024-01-23 15:32:09" itemprop="dateModified" datetime="2024-01-23T15:32:09+08:00">2024-01-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -204,7 +198,7 @@
               </span>
               <span class="post-meta-item-text">分類於</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/LucasBlog.github.io/categories/Deep-Learning/" itemprop="url" rel="index"><span itemprop="name">Deep Learning</span></a>
+                  <a href="/LucasBlog.github.io/categories/Web/" itemprop="url" rel="index"><span itemprop="name">Web</span></a>
                 </span>
             </span>
 
@@ -219,79 +213,27 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>上一次在Win10上安裝完了CUDA+Pytorch</p>
-<p>今天就來記錄在這裝置上執行UNet遇到的事情</p>
-<p>今天要執行的是這一版本的UNet:</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/milesial/Pytorch-UNet?source=post_page-----c59006b5964--------------------------------">milesial</a></p>
+        <p>因為自己開始撰寫部落格以及對於Web3的興趣，所以在閒暇之餘學習了HTML、CSS與JavaScript的基礎知識，想利用這篇文章來記錄避免以後忘記。<br>我是透過<a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PL4cUxeGkcC9ivBf_eKCPIAYXWzLlPAm6G">Net Ninja</a>的HTML與CSS教學來一步一步學習的，Net Ninja的教學非常推薦!由淺到深(但也沒有很深)的講解加上漂亮的簡報讓我看得非常舒服~相信0基礎的新手也可以快速上手的!</p>
 <span id="more"></span>
-<p>按照下面教學的指示，先將專案下載下來</p>
-<p>打開Anaconda Prompt</p>
-<p>cd到專案所在的資料夾後，執行:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install -r requirements.txt</span><br></pre></td></tr></table></figure>
-<p>安裝執行專案所有需要的函式庫</p>
-<p>然後下載專案中提供的Carvana資料集來進行訓練:</p>
-<p><a target="_blank" rel="noopener" href="https://www.kaggle.com/c/carvana-image-masking-challenge?source=post_page-----c59006b5964--------------------------------">Carvana</a></p>
-<p>“這個資料集只有切割出車子與背景兩個類別”</p>
-<p>資料集大概像這樣</p>
-<p><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*uvtqY9fUxXBMAovqkXWX5g.jpeg" alt="image_Car"><br>影像(image)</p>
-<p><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*u0ffSTtzYCXc72qjFdihgQ.gif" alt="image_SegCar"><br>遮罩(mask)</p>
-<p>在data&#x2F;image資料夾中放入要訓練的影像；data&#x2F;mask放入對應影像的遮罩</p>
-<p>接下來就可以進行訓練囉!</p>
-<p>在剛剛cd到專案所在位置的Anaconda Prompt中輸入:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python train.py -e 10 --amp</span><br></pre></td></tr></table></figure>
-<p>其中的-e是指Epoch，預設是10</p>
-<p>訓練完的權重會儲存在checkpoints資料夾中</p>
-<p>訓練完成後來測試看看，一樣在剛剛的Anaconda Prompt中輸入:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python predict.py -m ./checkpoints\checkpoint_epoch10.pth -i ./testimage\input\你要測試的影像.jpg -o ./testimage\output\輸出影像.jpg</span><br></pre></td></tr></table></figure>
-<p>改變上面的參數就可以選擇要使用哪一個權重進行測試、測試哪張影像跟輸出影像的檔案名稱!</p>
-<p>以下是我訓練了10個Epoch的輸出結果<br><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*tsX9TEeWp2Y5V2LNPjn6fg.jpeg" alt="image_testCar"><br><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*_4WIY-UyfOZmQeiTc86XSA.jpeg" alt="image_testCarSeg"><br>這個UNet訓練結果不錯喔 蠻結實的</p>
-<p>以上就是使用PyTorch版本UNet訓練Carvana資料集的結果拉~</p>
-<p>那我應該怎麼訓練自己的資料集呢</p>
-<p>首先 我們需要先建立自己的資料</p>
-<p>網路上大家成功訓練的案例都是使用labelme來進行標記</p>
-<p>所以我也就照抄</p>
-<p>先安裝labelme:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install labelme==3.16.2</span><br></pre></td></tr></table></figure>
-<p>這邊安裝labelme3.16.2版，為什麼我晚點解釋</p>
-<p>安裝完後在Anaconda Prompt裡面輸入:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">labelme</span><br></pre></td></tr></table></figure>
-<p><img src="https://miro.medium.com/v2/resize:fit:1100/format:webp/1*0xnzx0i6NedO5ZS_o1QL3A.png" alt="image_labelme"><br>就會開啟這個酷酷的東西</p>
-<p>然後開始進行標記，把OpenDir設到資料集中影像(image)所在的資料夾</p>
-<p>然後點File-&gt;Change Output Dir選擇輸出遮罩(mask)的資料夾</p>
-<p>接下來就可以開始標記拉</p>
-<p>原本以為這次專案可以這麼順利，但標記完之後才知道我真的是太天真了</p>
-<p>首先，labelme標記完輸出是Json檔，而UNet吃的檔案則是PNG檔，哭阿</p>
-<p>這邊我想用labelme內建的轉檔程式</p>
-<p>內建轉檔程式的位置在:<br><img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*HOHZ7alaq6PFAgF3gHZyPg.png" alt="image_labelmeCli"></p>
-<p>但是跑不起來，一執行就閃退，只好手動修改一下:</p>
-<p>修改完後一樣cd到程式所在的資料夾，然後輸入:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python json_to_dataset.py D:\你要轉的檔案路徑</span><br></pre></td></tr></table></figure>
-<p>然後就</p>
-<p>module ‘labelme.utils’ has no attribute ‘draw_label’ 報錯 哭阿</p>
-<p>查了一下發現是labelme安裝版本的問題，所以前面才說要安裝3.16.2版</p>
-<p>轉檔完成後，把資料都丟進去，本來以為可以訓練了</p>
-<p>結果又報錯</p>
-<p>AssertionError: Either no mask or multiple masks found for the ID</p>
-<p>原因是因為轉完的遮罩檔案名稱後綴是XX_json_label.png，可是UNet要得是XX_mask.png</p>
-<p>看來只好繼續寫程式轉檔了:</p>
-<p>轉完之後再來執行看看</p>
-<p>猜猜怎麼樣</p>
-<p>嘿嘿 Bingo答對囉 又報錯:</p>
-<p>RuntimeError: only batches of spatial targets supported (3D tensors) but got targets of size: : [1, 256, 256, 3]</p>
-<p>原因:轉出來的png檔案是彩色，通道數&#x3D;3</p>
-<p>可是UNet吃的Mask是灰階，通道數&#x3D;1</p>
-<p>哀 好吧 再寫一支程式，把影像轉成灰階:</p>
-<p>轉完之後再測試一次看看:</p>
-<p>IndexError: Target 38 is out of bounds.</p>
-<p>上網查了一下，說有可能是因為數據不匹配，</p>
-<p>看了之後才發現，這個UNet每一個像素點的值都是一個類別，也就是說，標記出來的區域應該要是灰階值為1的區域，才能成功運行。</p>
-<p>哀 好吧:</p>
-<p>把數據轉完之後測試了一下，兩個類別(背景+1個標記類別)跟三個類別大致上可以成功運作了，但超過4個預測時又双叒叕會出錯。</p>
-<p>ValueError: pic should not have &gt; 4 channels. Got 5 channels.</p>
-<p>原因出在predict.py這邊:<br><img src="https://miro.medium.com/v2/resize:fit:640/format:webp/1*hK28n3DfOC4KT-SKEZVl1Q.png" alt="image_predict.py"><br>這邊輸出超過4個類別時，沒有辦法轉成PILImage，哭阿。</p>
-<p>除錯到這邊，在這支程式上花了兩天的我決定</p>
-<p>Google搜尋:UNet +Multi-class + GitHub</p>
-<p>訓練多個類別的UNet&#x2F;UNet++ 我下一篇再來記錄囉!</p>
+<p>同時上面的HTML+CSS教學也會守把手教你創建一個好看的網站，這是我按照影片中的步驟一步一步撰寫出來的網站。<br><a target="_blank" rel="noopener" href="http://localhost:4000/LucasBlog.github.io/side_projects/member_only/index.html">會員制餐廳</a><br><del>這麼惡臭的網站有存在的必要嗎?自裁，請(無慈悲)</del></p>
+<p>以下紀錄幾個影片中學習到的知識</p>
+<h2 id="Class與Id"><a href="#Class與Id" class="headerlink" title="Class與Id"></a>Class與Id</h2><p>HTML中，使用Class與Id都可以讓當前的標籤被指定，可以在之後使用CSS或是JavaScript操作；而Class與Id的區別是Id是唯一的，不能有相同名稱的Id存在；而Class則允許有許多相同的名稱的Class存在，所以Id比較常被使用在JavaScript特定操作時，而Class比較常被使用在CSS需要同時對某個標籤做裝飾時。</p>
+<h2 id="pseudo-classes"><a href="#pseudo-classes" class="headerlink" title="pseudo classes"></a>pseudo classes</h2><p>CSS中可以使用Pseudo Classes來建立一些網頁與使用者的互動，讓網頁看起來更加現代與專業；影片中有使用hover、focus、valid與selection。<br>hover: </p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">nav</span> <span class="selector-tag">li</span> <span class="selector-tag">a</span><span class="selector-pseudo">:hover</span>&#123;</span><br><span class="line">    <span class="attribute">text-decoration</span>: underline;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>當鼠標懸停在nav元素內的列表項目(li)中的連結(a)上時，它將連結的文字下加上下劃線（text-decoration: underline;），提供視覺反饋，表明這是一個可點擊的連結。</p>
+<p>focus:</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">form</span> <span class="selector-tag">input</span><span class="selector-pseudo">:focus</span>&#123;</span><br><span class="line">    <span class="attribute">border</span>:<span class="number">4px</span> dashed <span class="number">#4B4B4B</span>;</span><br><span class="line">    <span class="attribute">outline</span>: none;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>當表單中的輸入框被點擊時（用戶正在輸入時），該樣式會被應用；它將輸入框的邊框改為4像素寬的虛線並且去除框線。</p>
+<p>valid:</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">form</span> <span class="selector-tag">input</span><span class="selector-pseudo">:valid</span>&#123;</span><br><span class="line">    <span class="attribute">border</span>:<span class="number">4px</span> solid <span class="number">#71d300</span>;        </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>當表單輸入框的內容符合HTML5驗證規則時（正確的E-mail地址），該樣式將會被應用。它將輸入框的邊框變為4像素寬的實線，並改為綠色（border: 4px solid #71d300;），表示輸入有效。</p>
+<p>selection:</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">p</span><span class="selector-pseudo">::selection</span>&#123;</span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#140c01fb</span>;</span><br><span class="line">    <span class="attribute">color</span>: white;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>當用戶選擇（或突出顯示）頁面上的段落文本時，該樣式會被應用。它會改變選中文本的背景顏色和文字顏色，分別為深棕色背景和白色文字，以提高可讀性和視覺效果。</p>
+<h2 id="media-screen"><a href="#media-screen" class="headerlink" title="@media screen"></a>@media screen</h2><p>使用手機瀏覽網頁時，如果有些網頁上的布置都擠成一團不知道該如何點擊時，那肯定是網頁設計者沒有對於小螢幕的使用者做一些修改，media screen就是用來解決這樣的問題的。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@media</span> screen <span class="keyword">and</span> (<span class="attribute">max-width</span>: <span class="number">700px</span>)&#123;</span><br><span class="line">    <span class="selector-class">.banner</span> <span class="selector-class">.welcome</span>&#123;</span><br><span class="line">        <span class="attribute">position</span>: relative;</span><br><span class="line">        <span class="attribute">padding</span>: <span class="number">10px</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="selector-class">.banner</span> <span class="selector-class">.welcome</span> br&#123;</span><br><span class="line">        <span class="attribute">display</span>: none;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="selector-class">.banner</span> <span class="selector-class">.welcome</span> <span class="selector-tag">h2</span>&#123;</span><br><span class="line">        <span class="attribute">font-size</span>: <span class="number">30px</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="selector-tag">nav</span> <span class="selector-tag">li</span>&#123;</span><br><span class="line">        <span class="attribute">font-size</span>: <span class="number">18px</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="selector-class">.banner</span> <span class="selector-class">.welcome</span> <span class="selector-tag">span</span>&#123;</span><br><span class="line">        <span class="attribute">font-size</span>: <span class="number">1em</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="selector-class">.images</span> <span class="selector-tag">li</span>&#123;</span><br><span class="line">        <span class="attribute">width</span>: <span class="number">100%</span>;</span><br><span class="line">        <span class="attribute">margin</span>: <span class="number">20px</span> auto;</span><br><span class="line">        <span class="attribute">display</span>: block;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的CSS是在螢幕寬度小於700px時，他會做出相對應的改變，這對於現代網站應該是非常重要的一環，畢竟大眾使用手機的時間可能都遠遠超過使用電腦的時間了。</p>
+<p>以上就是上完HTML與CSS課程的一些筆記。</p>
 
     </div>
 
@@ -307,7 +249,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>文章連結：</strong>
-    <a href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/" title="在Win10上執行PyTorch版本的UNet訓練自己的資料集">https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/在Win10上執行PyTorch版本的UNet訓練自己的資料集/</a>
+    <a href="https://lsc25846.github.io/LucasBlog.github.io/2024/01/18/%E9%A4%90%E5%BB%B3/" title="使用HTML與CSS來建立靜態網站-會員制餐廳官方網站">https://lsc25846.github.io/LucasBlog.github.io/2024/01/18/餐廳/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
@@ -324,7 +266,7 @@
     </li>
     <li class="post-copyright-link">
       <strong>文章連結：</strong>
-      <a href="https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/%E5%9C%A8Win10%E4%B8%8A%E5%9F%B7%E8%A1%8CPyTorch%E7%89%88%E6%9C%AC%E7%9A%84UNet%E8%A8%93%E7%B7%B4%E8%87%AA%E5%B7%B1%E7%9A%84%E8%B3%87%E6%96%99%E9%9B%86/" title="在Win10上執行PyTorch版本的UNet訓練自己的資料集">https://lsc25846.github.io/LucasBlog.github.io/2022/04/22/在Win10上執行PyTorch版本的UNet訓練自己的資料集/</a>
+      <a href="https://lsc25846.github.io/LucasBlog.github.io/2024/01/18/%E9%A4%90%E5%BB%B3/" title="使用HTML與CSS來建立靜態網站-會員制餐廳官方網站">https://lsc25846.github.io/LucasBlog.github.io/2024/01/18/餐廳/</a>
     </li>
     <li class="post-copyright-license">
       <strong>版權聲明： </strong>本網誌所有文章除特別聲明外，均採用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 許可協議。轉載請註明出處！
@@ -334,7 +276,9 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/LucasBlog.github.io/tags/Deep-Learning/" rel="tag"># Deep Learning</a>
+              <a href="/LucasBlog.github.io/tags/Side-Project/" rel="tag"># Side Project</a>
+              <a href="/LucasBlog.github.io/tags/HTML/" rel="tag"># HTML</a>
+              <a href="/LucasBlog.github.io/tags/CSS/" rel="tag"># CSS</a>
           </div>
 
         
@@ -343,12 +287,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/LucasBlog.github.io/2022/04/21/Windows%2010%20%E5%AE%89%E8%A3%9DCUDA%E3%80%81cuDNN%E3%80%81Pytorch%E7%B4%80%E9%8C%84/" rel="prev" title="Windows 10 安裝CUDA、cuDNN、Pytorch紀錄">
-      <i class="fa fa-chevron-left"></i> Windows 10 安裝CUDA、cuDNN、Pytorch紀錄
+    <a href="/LucasBlog.github.io/2024/01/10/%E4%BD%BF%E7%94%A8chatGPT%E8%A3%BD%E4%BD%9CCsharp%E5%A0%B1%E5%83%B9%E7%B3%BB%E7%B5%B1/" rel="prev" title="使用chat GPT製作C# 報價系統">
+      <i class="fa fa-chevron-left"></i> 使用chat GPT製作C# 報價系統
     </a></div>
       <div class="post-nav-item">
-    <a href="/LucasBlog.github.io/2022/04/27/UNet++(Nested%20UNet)%E5%AE%89%E8%A3%9D%E7%B4%80%E9%8C%84/" rel="next" title="UNet++(Nested UNet)安裝紀錄">
-      UNet++(Nested UNet)安裝紀錄 <i class="fa fa-chevron-right"></i>
+    <a href="/LucasBlog.github.io/2024/01/22/%E5%80%8B%E4%BA%BA%E5%B1%A5%E6%AD%B7/" rel="next" title="JavaScript學習筆記：Arrow Function與DOM操作(個人履歷網站)">
+      JavaScript學習筆記：Arrow Function與DOM操作(個人履歷網站) <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -408,6 +352,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Class%E8%88%87Id"><span class="nav-number">1.</span> <span class="nav-text">Class與Id</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pseudo-classes"><span class="nav-number">2.</span> <span class="nav-text">pseudo classes</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#media-screen"><span class="nav-number">3.</span> <span class="nav-text">@media screen</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
